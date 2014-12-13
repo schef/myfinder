@@ -3,11 +3,12 @@
 from colorama import Fore, Back, Style
 from subprocess import call
 from imdbpie import Imdb
+import textwrap
 imdb = Imdb()
 imdb = Imdb({'anonymize' : True}) # to proxy requests
 
 
-print (Fore.BLUE + "Connecting to IMDb and reading from database..." + Fore.RESET)
+print (Fore.YELLOW + "==>", Fore.BLUE + "Connecting to IMDb and reading from database..." + Fore.RESET)
 
 # Creating an instance with caching enabled
 # Note that the cached responses expire every 2 hours or so.
@@ -25,12 +26,15 @@ try:
     searchlist = imdb.find_by_title(lines[0])
     first_match = searchlist[0]['imdb_id']
     movie = imdb.find_movie_by_id(first_match)
-    print ( Fore.YELLOW + movie.title + Fore.RESET, Fore.GREEN + movie.rating + Fore.RESET, Fore.BLUE + movie.genres + Fore.RESET)
-    print (movie.plot_outline)
+    genresString = ", ".join(str(x) for x in movie.genres)
+    plotString = textwrap.dedent(movie.plot_outline).strip()
+    print ( Fore.YELLOW + "==>", Fore.GREEN + movie.title, Fore.RED + str(movie.rating), Fore.BLUE + genresString + Fore.RESET)
+    print (textwrap.fill(plotString, initial_indent='    ', subsequent_indent='    '))
     call(["feh", movie.cover_url])
 
     #TODO:questin if it is a movie of episode.
-    anwser = input('What should i do?([n]ext, [p]ilot, [b]lacklist, [w]atchlist): ')
+    print (Fore.YELLOW + "==>", Fore.BLUE + 'What should i do?([n]ext, [p]ilot, [b]lacklist, [w]atchlist): ')
+    anwser = input()
     if ( anwser == 'n'):
       print ("next")
       lines.pop(0)
